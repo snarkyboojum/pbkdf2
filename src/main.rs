@@ -12,8 +12,8 @@ fn main() {
 
     let password = vec![0xa; 16];
     let salt = vec![0x0; 16];
-    let length: u32 = 512;
-    let mut mk = vec![0u8; (length / 8) as usize];
+    let key_length: u32 = 512;
+    let mut mk = vec![0u8; (key_length / 8) as usize];
 
-    let mk = pbkdf(&password, &salt, length, &mut mk);
+    let mk = pbkdf(&password, &salt, key_length, &mut mk);
 }
