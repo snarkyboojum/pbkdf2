@@ -17,11 +17,11 @@ fn pbkdf_hmac_sha512(
         panic!("Key length too large");
     }
 
-    // we round up using integer divison
-    // TODO: is there a better way?
+    // we round up using integer divison - this works for +ive integers and doesn't take
+    // into account overflow etc
     let len = (key_length + (Hash512::DigestSize as u32 - 1)) / Hash512::DigestSize as u32;
     let r = (key_length - (len - 1) * Hash512::DigestSize as u32) as usize;
-    println!("r: {}, len: {}, key_length: {}", r, len, key_length);
+    //println!("r: {}, len: {}, key_length: {}", r, len, key_length);
 
     // I think the salt needs to be the same length as the output of SHA512
     //assert_eq!(salt.len(), Hash512::DigestSize as usize / 8);
@@ -32,24 +32,24 @@ fn pbkdf_hmac_sha512(
         let mut T = vec![0u64; 8];
         let mut i_bytes = [0u8; 4];
         BigEndian::write_u32(&mut i_bytes, i);
-        println!("i_bytes: {:2x?}", i_bytes);
-        println!("salt: {:2x?}", salt);
+        //println!("i_bytes: {:2x?}", i_bytes);
+        //println!("salt: {:2x?}", salt);
 
         // U = salt || Int(i)
         let mut U = [salt, &i_bytes].concat();
-        println!("U is {:?}", U);
-        println!("password: {:?}", password);
-        println!("iter_count: {}", iter_count);
+        //println!("U is {:?}", U);
+        //println!("password: {:?}", password);
+        //println!("iter_count: {}", iter_count);
 
         for _ in 1..=iter_count {
             let mac = hmac_sha512(password, &U);
             U = vec![0u8; Hash512::DigestSize as usize / 8];
             BigEndian::write_u64_into(&mac, &mut U);
-            println!("mac is {:?}", mac);
+            //println!("mac is {:?}", mac);
             for (i, hash) in mac.iter().enumerate() {
                 T[i] ^= hash;
             }
-            println!("T is {:?}", T);
+            //println!("T is {:?}", T);
         }
         // convert T to u8
         let mut t_bytes = vec![0u8; (T.len() * 8) as usize];
@@ -58,7 +58,7 @@ fn pbkdf_hmac_sha512(
         master_key.extend(&t_bytes); // [0..r];
     }
     mk.extend(&master_key[0..r / 8]);
-    println!("mk is {:?}", mk);
+    //println!("mk is {:?}", mk);
 }
 
 fn main() {
