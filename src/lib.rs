@@ -3,7 +3,7 @@ extern crate hmac_sha;
 use byteorder::{BigEndian, ByteOrder};
 use hmac_sha::{hmac_sha512, Hash512};
 
-fn pbkdf_hmac_sha512(
+pub fn pbkdf_hmac_sha512(
     password: &[u8],
     salt: &[u8],
     iter_count: u32,
@@ -27,6 +27,8 @@ fn pbkdf_hmac_sha512(
     //assert_eq!(salt.len(), Hash512::DigestSize as usize / 8);
 
     let mut master_key = vec![0u8; mk.len()];
+
+    #[allow(non_snake_case)]
     for i in 1..=len {
         // T needs to be 512 bits wide
         let mut T = vec![0u64; 8];
@@ -59,20 +61,6 @@ fn pbkdf_hmac_sha512(
     }
     mk.extend(&master_key[0..r / 8]);
     //println!("mk is {:?}", mk);
-}
-
-fn main() {
-    println!("Welcome to the PBKDF2 implementation in Rust!");
-
-    let password = vec![0xac; 8];
-    let salt = vec![0xb; 64];
-    let key_length: u32 = 512;
-    let iter_count: u32 = 2;
-    let mut mk: Vec<u8> = Vec::new(); //vec![0u8; (key_length / 8) as usize];
-
-    // generate the master key
-    pbkdf_hmac_sha512(&password, &salt, iter_count, key_length, &mut mk);
-    println!("mk is {:?}", mk);
 }
 
 #[cfg(test)]
