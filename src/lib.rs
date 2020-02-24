@@ -10,7 +10,7 @@ pub fn pbkdf_hmac_sha512(
     key_length: u32,
     mk: &mut Vec<u8>,
 ) {
-    println!("Running key derivation function");
+    //println!("Running key derivation function");
 
     // TODO: unnecessary cast to u64
     if key_length as u64 > (std::u32::MAX - 1) as u64 * Hash512::DigestSize as u64 {
