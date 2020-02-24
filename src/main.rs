@@ -36,14 +36,15 @@ fn pbkdf_hmac_sha512(
         println!("salt: {:2x?}", salt);
 
         // U = salt || Int(i)
-        let U = [salt, &i_bytes].concat();
+        let mut U = [salt, &i_bytes].concat();
         println!("U is {:?}", U);
         println!("password: {:?}", password);
         println!("iter_count: {}", iter_count);
 
-        for j in 1..=iter_count {
-            // TODO: this is broken!
-            U = hmac_sha512(password, &U);
+        for _ in 1..=iter_count {
+            let mac = hmac_sha512(password, &U);
+            U = vec![0u8; Hash512::DigestSize as usize / 8];
+            BigEndian::write_u64_into(&mac, &mut U);
             println!("mac is {:?}", mac);
             for (i, hash) in mac.iter().enumerate() {
                 T[i] ^= hash;
@@ -99,7 +100,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn test_pbkdf_medium() {
         let password = "passDATAb00AB7YxDTT".as_bytes();
         let salt = "saltKEYbcTcXHCBxtjD".as_bytes();
